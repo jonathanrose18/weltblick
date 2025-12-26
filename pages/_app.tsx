@@ -1,6 +1,48 @@
-import "@/styles/globals.css";
+import { Geist, Geist_Mono } from "next/font/google";
+import { ThemeProvider } from "next-themes";
+import { useReportWebVitals } from "next/web-vitals";
 import type { AppProps } from "next/app";
+import type { NextPage } from "next";
+import type { ReactElement, ReactNode } from "react";
 
-export default function App({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
+import { cn } from "@/shared/lib/utils";
+
+import "@/shared/styles/globals.css";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+  getLayout?: (page: ReactElement) => ReactNode;
+};
+
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout;
+};
+
+export default function App({ Component, pageProps }: AppPropsWithLayout) {
+  useReportWebVitals(console.log);
+
+  const getLayout = Component.getLayout ?? ((page) => page);
+
+  return (
+    <main
+      className={cn(
+        geistSans.className,
+        geistMono.variable,
+        "h-screen overflow-y-auto tracking-tight antialiased dark:from-zinc-900 dark:to-zinc-900 dark:via-black dark:bg-linear-to-bl bg-linear-to-bl from-zinc-200 via-white to-zinc-200"
+      )}
+    >
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        {getLayout(<Component {...pageProps} />)}
+      </ThemeProvider>
+    </main>
+  );
 }
