@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { useReportWebVitals } from "next/web-vitals";
+import { useRouter } from "next/router";
 import type { AppProps } from "next/app";
 import type { NextPage } from "next";
 import type { ReactElement, ReactNode } from "react";
@@ -28,6 +29,8 @@ type AppPropsWithLayout = AppProps & {
 };
 
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
+  const router = useRouter();
+
   useReportWebVitals(console.log);
 
   const getLayout = Component.getLayout ?? ((page) => page);
