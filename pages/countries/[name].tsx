@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ClockIcon, MoveLeftIcon } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 import type { GetServerSideProps } from "next";
 import type { ReactElement } from "react";
 
@@ -9,20 +8,29 @@ import { Layout } from "@/shared/components/layout";
 import { Badge } from "@/shared/components/ui/badge";
 import { HoverCard } from "@/shared/components/ui/hover-card";
 import { WeatherCard } from "@/shared/components/weather-card";
-import { countriesClient } from "@/shared/countries/countries-client";
-import type { Country } from "@/shared/types";
+import { countriesClient } from "@/features/countries/countries-client";
+import type { Country } from "@/features/countries/types";
+import { useWeather } from "@/features/weather/use-weather";
 import type { NextPageWithLayout } from "@/pages/_app";
 
 export const getServerSideProps = (async (context) => {
-  const res = await countriesClient.get(
-    `/name/${context.query.name}?fullText=true`
-  );
+  const name = context.query.name;
+  if (!name || typeof name !== "string") {
+    return { notFound: true };
+  }
 
-  return {
-    props: {
-      country: res.data[0] || null,
-    },
-  };
+  try {
+    const res = await countriesClient.get<Country[]>(
+      `/name/${name}?fullText=true`
+    );
+    return {
+      props: {
+        country: res.data[0] || null,
+      },
+    };
+  } catch (error) {
+    return { notFound: true };
+  }
 }) satisfies GetServerSideProps<{}>;
 
 const Page: NextPageWithLayout<{ country: Country }> = ({ country }) => {
@@ -30,13 +38,7 @@ const Page: NextPageWithLayout<{ country: Country }> = ({ country }) => {
     isPending: loading,
     error,
     data: weather,
-  } = useQuery({
-    queryKey: ["weather-" + country.name.common.toLowerCase()],
-    queryFn: () =>
-      fetch(`/api/weather/${country.name.common.toLowerCase()}`).then((res) =>
-        res.json()
-      ),
-  });
+  } = useWeather(country.name.common);
 
   if (!country) {
     return (
@@ -86,7 +88,7 @@ const Page: NextPageWithLayout<{ country: Country }> = ({ country }) => {
         {country.capital && country.capital[0] && (
           <WeatherCard
             capital={country.capital[0]}
-            weather={weather}
+            weather={weather || null}
             loading={loading}
             error={error?.message || null}
           />

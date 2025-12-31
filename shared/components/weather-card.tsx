@@ -1,7 +1,7 @@
 import { CloudIcon } from "lucide-react";
 
 import { HoverCard } from "@/shared/components/ui/hover-card";
-import type { WeatherData } from "@/shared/types";
+import type { WeatherData } from "@/features/weather/types";
 
 interface WeatherCardProps {
   capital: string;
