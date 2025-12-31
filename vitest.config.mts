@@ -9,6 +9,14 @@ export default defineConfig({
     environment: "happy-dom",
     globals: true,
     setupFiles: [],
+    include: ["**/*.{test,spec}.?(c|m)[jt]s?(x)"],
+    exclude: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/cypress/**",
+      "**/.{idea,git,cache,output,temp}/**",
+      "**/e2e/**",
+    ],
     alias: {
       "@": path.resolve(__dirname, "./"),
     },
