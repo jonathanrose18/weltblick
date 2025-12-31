@@ -13,12 +13,12 @@ const Dock = React.forwardRef<HTMLDivElement, DockProps>(
         ref={ref}
         className={cn(
           "fixed bottom-4 left-1/2 -translate-x-1/2 z-40 min-w-24 flex items-center justify-center border-border bg-white dark:bg-black flex-row gap-3 rounded-2xl border px-2 py-2",
-          className
+          className,
         )}
         {...props}
       />
     );
-  }
+  },
 );
 Dock.displayName = "Dock";
 
@@ -32,7 +32,7 @@ const DockIcon = React.forwardRef<HTMLDivElement, DockIconProps>(
       <div
         className={cn(
           "h-5 w-5 inline-flex items-center justify-center transition-all duration-500 text-black/50 group-hover:text-black dark:text-white/50 group-hover:dark:text-white hover:scale-110",
-          className
+          className,
         )}
         ref={ref}
         {...props}
@@ -40,7 +40,7 @@ const DockIcon = React.forwardRef<HTMLDivElement, DockIconProps>(
         {children}
       </div>
     );
-  }
+  },
 );
 DockIcon.displayName = "DockIcon";
 

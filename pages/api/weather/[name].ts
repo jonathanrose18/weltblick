@@ -1,52 +1,73 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import { weatherClient } from "@/shared/weather/weather-client";
 import { countriesClient } from "@/shared/countries/countries-client";
+import { weatherClient } from "@/shared/weather/weather-client";
+import type { WeatherData } from "@/shared/types";
 
-type ResponseData = {
-  message: string;
-};
+type ResponseData = WeatherData | { message: string };
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) {
   if (req.method !== "GET") {
-    res.status(405).end();
-    return;
+    return res.status(405).json({ message: "Method not allowed" });
   }
 
-  const countryName = req.query.name;
+  const { name } = req.query;
 
-  if (!countryName) {
-    res.status(400).end();
-    return;
+  if (!name || typeof name !== "string") {
+    return res.status(400).json({ message: "Country name is required" });
   }
 
-  const countriesResponse = await countriesClient.get(
-    `/name/${(req.query.name as string).toLocaleLowerCase()}?fullText=true`
-  );
+  const sanitizedCountryName = name.trim().toLowerCase();
 
-  const latlng = countriesResponse.data[0]?.capitalInfo?.latlng || null;
+  try {
+    const countriesResponse = await countriesClient.get(
+      `/name/${sanitizedCountryName}?fullText=true`
+    );
 
-  console.log({ latlng });
+    const countryData = countriesResponse.data[0];
+    const latlng = countryData?.capitalInfo?.latlng;
 
-  if (!latlng) {
-    res.status(404).end();
-    return;
+    if (!latlng || latlng.length !== 2) {
+      console.warn(
+        `No location data found for country: ${sanitizedCountryName}`
+      );
+      return res.status(404).json({ message: "Location data not found" });
+    }
+
+    const [lat, lng] = latlng;
+
+    const weatherResponse = await weatherClient.get(`/forecast`, {
+      params: {
+        latitude: lat,
+        longitude: lng,
+        current: "temperature_2m,weather_code,wind_speed_10m",
+      },
+    });
+
+    if (!weatherResponse.data) {
+      throw new Error("Failed to fetch weather data");
+    }
+
+    const weather: WeatherData = weatherResponse.data;
+
+    return res.status(200).json(weather);
+  } catch (error: unknown) {
+    console.error("API Error:", error);
+
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "response" in error &&
+      (error as any).response?.status === 404
+    ) {
+      return res.status(404).json({ message: "Country not found" });
+    }
+
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    return res.status(500).json({ message: errorMessage });
   }
-
-  const [lat, lng] = latlng;
-
-  if (!lat || !lng) {
-    res.status(400).end();
-    return;
-  }
-
-  const weatherResponse = await weatherClient.get(
-    `/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weather_code,wind_speed_10m`
-  );
-  const weather = weatherResponse.data;
-
-  res.status(200).json(weather);
 }

@@ -1,14 +1,13 @@
+import { formatDistance } from "date-fns";
+import type { GetStaticProps, InferGetStaticPropsType } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import type { GetStaticProps, InferGetStaticPropsType } from "next";
 import type { ReactElement } from "react";
-
-import { HoverCard } from "@/shared/components/ui/hover-card";
+import type { NextPageWithLayout } from "@/pages/_app";
 import { Layout } from "@/shared/components/layout";
+import { HoverCard } from "@/shared/components/ui/hover-card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { countriesClient } from "@/shared/countries/countries-client";
-import { formatDistance } from "date-fns";
-import type { NextPageWithLayout } from "@/pages/_app";
 
 type Country = {
   capital?: string[];
@@ -18,11 +17,11 @@ type Country = {
 
 export const getStaticProps = (async () => {
   const res = await countriesClient.get<Country[]>(
-    "/all?fields=name,flags,capital"
+    "/all?fields=name,flags,capital",
   );
 
   const countries = res.data.sort((a, b) =>
-    a.name.common.localeCompare(b.name.common)
+    a.name.common.localeCompare(b.name.common),
   );
 
   return {
@@ -40,7 +39,7 @@ const Page: NextPageWithLayout<PageProps> = ({ countries, lastUpdated }) => {
   const lastUpdatedDistance = formatDistance(
     new Date(),
     new Date(lastUpdated),
-    { includeSeconds: true }
+    { includeSeconds: true },
   );
   return (
     <div className="grid grid-cols-12 gap-4">

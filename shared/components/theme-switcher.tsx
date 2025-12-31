@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 import { cn } from "@/shared/lib/utils";
 
@@ -27,7 +27,7 @@ export function ThemeSwitcher() {
       onClick={toggleTheme}
       className={cn(
         "cursor-pointer group relative h-5 w-5 rounded-full transition-all duration-500 ease-out",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       )}
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
     >
@@ -36,7 +36,7 @@ export function ThemeSwitcher() {
           "absolute inset-0 flex items-center justify-center transition-all duration-500",
           isDark
             ? "rotate-90 scale-0 opacity-0"
-            : "rotate-0 scale-100 opacity-100"
+            : "rotate-0 scale-100 opacity-100",
         )}
       >
         <svg
@@ -72,7 +72,7 @@ export function ThemeSwitcher() {
           "absolute inset-0 flex items-center justify-center transition-all duration-500",
           isDark
             ? "rotate-0 scale-100 opacity-100"
-            : "-rotate-90 scale-0 opacity-0"
+            : "-rotate-90 scale-0 opacity-0",
         )}
       >
         <svg

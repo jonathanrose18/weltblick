@@ -1,58 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ClockIcon, CloudIcon, MoveLeftIcon } from "lucide-react";
-import { useState, useEffect } from "react";
+import { ClockIcon, MoveLeftIcon } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import type { GetServerSideProps } from "next";
 import type { ReactElement } from "react";
 
+import { Layout } from "@/shared/components/layout";
 import { Badge } from "@/shared/components/ui/badge";
 import { HoverCard } from "@/shared/components/ui/hover-card";
-import { Layout } from "@/shared/components/layout";
+import { WeatherCard } from "@/shared/components/weather-card";
 import { countriesClient } from "@/shared/countries/countries-client";
+import type { Country } from "@/shared/types";
 import type { NextPageWithLayout } from "@/pages/_app";
-
-interface Country {
-  name: {
-    common: string;
-    official: string;
-    nativeName?: Record<string, { official: string; common: string }>;
-  };
-  capital?: string[];
-  region: string;
-  subregion?: string;
-  population: number;
-  area: number;
-  flags: {
-    png: string;
-    svg: string;
-    alt?: string;
-  };
-  coatOfArms?: {
-    png: string;
-    svg: string;
-  };
-  currencies?: Record<string, { name: string; symbol: string }>;
-  languages?: Record<string, string>;
-  timezones?: string[];
-  continents?: string[];
-  capitalInfo?: {
-    latlng: [number, number];
-  };
-  maps?: {
-    googleMaps: string;
-    openStreetMaps: string;
-  };
-  landlocked: boolean;
-  cca2: string;
-}
-
-interface WeatherData {
-  current: {
-    temperature_2m: number;
-    weather_code: number;
-    wind_speed_10m: number;
-  };
-}
 
 export const getServerSideProps = (async (context) => {
   const res = await countriesClient.get(
@@ -67,26 +26,17 @@ export const getServerSideProps = (async (context) => {
 }) satisfies GetServerSideProps<{}>;
 
 const Page: NextPageWithLayout<{ country: Country }> = ({ country }) => {
-  const [weather, setWeather] = useState<WeatherData | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchWeather = async () => {
-      try {
-        const response = await fetch(
-          "/api/weather/" + country.name.common.toLocaleLowerCase()
-        );
-        const data = await response.json();
-        setWeather(data);
-      } catch (error) {
-        console.error("Weather fetch error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchWeather();
-  }, [country]);
+  const {
+    isPending: loading,
+    error,
+    data: weather,
+  } = useQuery({
+    queryKey: ["weather-" + country.name.common.toLowerCase()],
+    queryFn: () =>
+      fetch(`/api/weather/${country.name.common.toLowerCase()}`).then((res) =>
+        res.json()
+      ),
+  });
 
   if (!country) {
     return (
@@ -97,22 +47,6 @@ const Page: NextPageWithLayout<{ country: Country }> = ({ country }) => {
       </div>
     );
   }
-
-  const getWeatherDescription = (code: number) => {
-    const weatherCodes: Record<number, string> = {
-      0: "Clear",
-      1: "Mostly clear",
-      2: "Partly cloudy",
-      3: "Cloudy",
-      45: "Foggy",
-      48: "Foggy",
-      51: "Light drizzle",
-      61: "Light rain",
-      80: "Rain showers",
-    };
-
-    return weatherCodes[code] || "Unknown";
-  };
 
   return (
     <>
@@ -150,43 +84,12 @@ const Page: NextPageWithLayout<{ country: Country }> = ({ country }) => {
 
       <div className="space-y-4">
         {country.capital && country.capital[0] && (
-          <HoverCard hoverable={false}>
-            <div className="flex items-center gap-2 mb-2">
-              <CloudIcon className="w-5 h-5" />
-              Weather in {country.capital[0]}
-            </div>
-
-            {loading ? (
-              <p className="text-muted-foreground">Loading weather data…</p>
-            ) : weather ? (
-              <div className="flex flex-wrap gap-6">
-                <div className="flex items-center gap-2">
-                  <div>
-                    <p>{weather.current.temperature_2m}°C</p>
-                    <p className="text-xs text-muted-foreground">Temperature</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <div>
-                    <p>{getWeatherDescription(weather.current.weather_code)}</p>
-                    <p className="text-xs text-muted-foreground">Conditions</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <div>
-                    <p>{weather.current.wind_speed_10m} km/h</p>
-                    <p className="text-xs text-muted-foreground">Wind speed</p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <p className="text-muted-foreground">
-                Weather could not be loaded
-              </p>
-            )}
-          </HoverCard>
+          <WeatherCard
+            capital={country.capital[0]}
+            weather={weather}
+            loading={loading}
+            error={error?.message || null}
+          />
         )}
 
         {country.timezones && country.timezones.length > 0 && (

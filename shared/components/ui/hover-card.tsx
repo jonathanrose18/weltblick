@@ -15,13 +15,13 @@ const HoverCard = React.forwardRef<HTMLDivElement, HoverCardProps>(
           "w-full relative bg-muted/50 rounded-lg border border-border p-4",
           hoverable &&
             "cursor-pointer hover:shadow-md dark:hover:ring-1 dark:ring-border dark:ring-offset-1 transition-shadow duration-500",
-          className
+          className,
         )}
         ref={ref}
         {...props}
       />
     );
-  }
+  },
 );
 
 HoverCard.displayName = "HoverCard";

@@ -1,7 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { useReportWebVitals } from "next/web-vitals";
-import { useRouter } from "next/router";
 import type { AppProps } from "next/app";
 import type { NextPage } from "next";
 import type { ReactElement, ReactNode } from "react";
@@ -20,6 +20,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const queryClient = new QueryClient();
+
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
 };
@@ -29,9 +31,7 @@ type AppPropsWithLayout = AppProps & {
 };
 
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
-  const router = useRouter();
-
-  useReportWebVitals(console.log);
+  useReportWebVitals((vitals) => console.log("Vitals: ", vitals));
 
   const getLayout = Component.getLayout ?? ((page) => page);
 
@@ -44,7 +44,9 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       )}
     >
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        {getLayout(<Component {...pageProps} />)}
+        <QueryClientProvider client={queryClient}>
+          {getLayout(<Component {...pageProps} />)}
+        </QueryClientProvider>
       </ThemeProvider>
     </main>
   );
