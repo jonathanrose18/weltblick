@@ -7,10 +7,10 @@ import type { ReactElement } from "react";
 import { Layout } from "@/shared/components/layout";
 import { Badge } from "@/shared/components/ui/badge";
 import { HoverCard } from "@/shared/components/ui/hover-card";
-import { WeatherCard } from "@/shared/components/weather-card";
+import { WeatherCard } from "@/features/weather/components/weather-card";
 import { countriesClient } from "@/features/countries/countries-client";
-import type { Country } from "@/features/countries/types";
 import { useWeather } from "@/features/weather/use-weather";
+import type { Country } from "@/features/countries/types";
 import type { NextPageWithLayout } from "@/pages/_app";
 
 export const getServerSideProps = (async (context) => {
