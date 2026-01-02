@@ -1,29 +1,27 @@
-import Head from "next/head";
-import Image from "next/image";
-import Link from "next/link";
-import { ClockIcon, MoveLeftIcon } from "lucide-react";
-import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import type { ReactElement } from "react";
+import Head from 'next/head';
+import Image from 'next/image';
+import Link from 'next/link';
+import { ClockIcon, MoveLeftIcon } from 'lucide-react';
+import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import type { ReactElement } from 'react';
 
-import { Layout } from "@/shared/components/layout";
-import { Badge } from "@/shared/components/ui/badge";
-import { HoverCard } from "@/shared/components/ui/hover-card";
-import { WeatherCard } from "@/features/weather/components/weather-card";
-import { countriesClient } from "@/features/countries/countries-client";
-import { useWeather } from "@/features/weather/use-weather";
-import type { Country } from "@/features/countries/types";
-import type { NextPageWithLayout } from "@/pages/_app";
+import { Layout } from '@/shared/components/layout';
+import { Badge } from '@/shared/components/ui/badge';
+import { HoverCard } from '@/shared/components/ui/hover-card';
+import { WeatherCard } from '@/features/weather/components/weather-card';
+import { countriesClient } from '@/features/countries/countries-client';
+import { useWeather } from '@/features/weather/use-weather';
+import type { Country } from '@/features/countries/types';
+import type { NextPageWithLayout } from '@/pages/_app';
 
-export const getServerSideProps = (async (context) => {
+export const getServerSideProps = (async context => {
   const name = context.query.name;
-  if (!name || typeof name !== "string") {
+  if (!name || typeof name !== 'string') {
     return { notFound: true };
   }
 
   try {
-    const res = await countriesClient.get<Country[]>(
-      `/name/${name}?fullText=true`
-    );
+    const res = await countriesClient.get<Country[]>(`/name/${name}?fullText=true`);
     return {
       props: {
         country: res.data[0] || null,
@@ -39,15 +37,13 @@ export const getServerSideProps = (async (context) => {
 type PageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
 const Page: NextPageWithLayout<PageProps> = ({ country }) => {
-  const query = country?.name.common || "";
+  const query = country?.name.common || '';
   const { isPending: loading, error, data: weather } = useWeather(query);
 
   if (!country) {
     return (
-      <div className="container mx-auto py-12 px-4">
-        <p className="text-center text-muted-foreground">
-          Country could not be found
-        </p>
+      <div className='container mx-auto py-12 px-4'>
+        <p className='text-center text-muted-foreground'>Country could not be found</p>
       </div>
     );
   }
@@ -56,44 +52,36 @@ const Page: NextPageWithLayout<PageProps> = ({ country }) => {
     <>
       <Head>
         <title>{country.name.common}</title>
-        <meta
-          name="description"
-          content={country.name.common + " " + "detail page."}
-        />
+        <meta name='description' content={country.name.common + ' ' + 'detail page.'} />
       </Head>
-      <div className="mb-4">
-        <Link
-          className="text-primary gap-2 flex flex-row items-center hover:underline mb-4"
-          href="/"
-        >
+      <div className='mb-4'>
+        <Link className='text-primary gap-2 flex flex-row items-center hover:underline mb-4' href='/'>
           <MoveLeftIcon size={16} /> Back to overview
         </Link>
 
-        <div className="flex flex-col md:flex-row gap-6 items-start">
-          <div className="relative w-full md:w-48 h-32 rounded-lg overflow-hidden border shadow-lg">
+        <div className='flex flex-col md:flex-row gap-6 items-start'>
+          <div className='relative w-full md:w-48 h-32 rounded-lg overflow-hidden border shadow-lg'>
             <Image
               alt={country.flags.alt || `Flag of ${country.name.common}`}
-              className="object-cover"
+              className='object-cover'
               fill
               src={country.flags.png}
             />
           </div>
 
-          <div className="flex-1">
-            <div className="flex mb-2 flex-col">
+          <div className='flex-1'>
+            <div className='flex mb-2 flex-col'>
               <span>{country.name.common}</span>
-              <span className="text-sm text-balance text-muted-foreground">
-                {country.name.official}
-              </span>
+              <span className='text-sm text-balance text-muted-foreground'>{country.name.official}</span>
             </div>
-            {country.continents?.map((continent) => (
+            {country.continents?.map(continent => (
               <Badge key={continent}>{continent}</Badge>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className='space-y-4'>
         {country.capital && country.capital[0] && (
           <WeatherCard
             capital={country.capital[0]}
@@ -105,12 +93,12 @@ const Page: NextPageWithLayout<PageProps> = ({ country }) => {
 
         {country.timezones && country.timezones.length > 0 && (
           <HoverCard hoverable={false}>
-            <div className="flex items-center gap-2 mb-2">
-              <ClockIcon className="w-5 h-5" />
+            <div className='flex items-center gap-2 mb-2'>
+              <ClockIcon className='w-5 h-5' />
               Timezone
             </div>
-            {country.timezones.map((timezone) => (
-              <Badge key={timezone} variant="outline">
+            {country.timezones.map(timezone => (
+              <Badge key={timezone} variant='outline'>
                 {timezone}
               </Badge>
             ))}
