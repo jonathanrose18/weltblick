@@ -1,31 +1,31 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { NotFoundError } from "@/shared/lib/errors";
-import { countriesClient } from "@/features/countries/countries-client";
-import { getWeatherForCountry } from "@/features/weather/weather-service";
-import { weatherClient } from "@/features/weather/weather-client";
-import type { Country } from "@/features/countries/types";
+import { NotFoundError } from '@/shared/lib/errors';
+import { countriesClient } from '@/features/countries/countries-client';
+import { getWeatherForCountry } from '@/features/weather/weather-service';
+import { weatherClient } from '@/features/weather/weather-client';
+import type { Country } from '@/features/countries/types';
 
-vi.mock("@/features/countries/countries-client", () => ({
+vi.mock('@/features/countries/countries-client', () => ({
   countriesClient: {
     get: vi.fn(),
   },
 }));
 
-vi.mock("@/features/weather/weather-client", () => ({
+vi.mock('@/features/weather/weather-client', () => ({
   weatherClient: {
     get: vi.fn(),
   },
 }));
 
-describe("WeatherService", () => {
+describe('WeatherService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("should fetch weather data for a valid country name", async () => {
+  it('should fetch weather data for a valid country name', async () => {
     const mockCountry: Partial<Country> = {
-      name: { common: "Germany", official: "Federal Republic of Germany" },
+      name: { common: 'Germany', official: 'Federal Republic of Germany' },
       capitalInfo: { latlng: [51.0, 9.0] },
     };
     (countriesClient.get as any).mockResolvedValue({ data: [mockCountry] });
@@ -39,54 +39,48 @@ describe("WeatherService", () => {
     };
     (weatherClient.get as any).mockResolvedValue({ data: mockWeather });
 
-    const result = await getWeatherForCountry("Germany");
+    const result = await getWeatherForCountry('Germany');
 
-    expect(countriesClient.get).toHaveBeenCalledWith(
-      "/name/germany?fullText=true",
-    );
+    expect(countriesClient.get).toHaveBeenCalledWith('/name/germany?fullText=true');
     expect(weatherClient.get).toHaveBeenCalledWith(
-      "/forecast",
+      '/forecast',
       expect.objectContaining({
         params: expect.objectContaining({
           latitude: 51.0,
           longitude: 9.0,
         }),
-      }),
+      })
     );
     expect(result).toEqual(mockWeather);
   });
 
-  it("should throw NotFoundError if country lookup fails", async () => {
+  it('should throw NotFoundError if country lookup fails', async () => {
     (countriesClient.get as any).mockRejectedValue({
       response: { status: 404 },
     });
 
-    await expect(getWeatherForCountry("InvalidCountry")).rejects.toThrow();
+    await expect(getWeatherForCountry('InvalidCountry')).rejects.toThrow();
   });
 
-  it("should throw NotFoundError if country has no location data", async () => {
+  it('should throw NotFoundError if country has no location data', async () => {
     const mockCountry: Partial<Country> = {
-      name: { common: "Nowhere", official: "No Where" },
+      name: { common: 'Nowhere', official: 'No Where' },
       capitalInfo: { latlng: undefined as any }, // No location
     };
     (countriesClient.get as any).mockResolvedValue({ data: [mockCountry] });
 
-    await expect(getWeatherForCountry("Nowhere")).rejects.toThrow(
-      NotFoundError,
-    );
+    await expect(getWeatherForCountry('Nowhere')).rejects.toThrow(NotFoundError);
   });
 
-  it("should throw Error if weather fetch fails", async () => {
+  it('should throw Error if weather fetch fails', async () => {
     const mockCountry: Partial<Country> = {
-      name: { common: "Germany", official: "Federal Republic of Germany" },
+      name: { common: 'Germany', official: 'Federal Republic of Germany' },
       capitalInfo: { latlng: [51.0, 9.0] },
     };
     (countriesClient.get as any).mockResolvedValue({ data: [mockCountry] });
 
-    (weatherClient.get as any).mockRejectedValue(new Error("Weather API Down"));
+    (weatherClient.get as any).mockRejectedValue(new Error('Weather API Down'));
 
-    await expect(getWeatherForCountry("Germany")).rejects.toThrow(
-      "Weather API Down",
-    );
+    await expect(getWeatherForCountry('Germany')).rejects.toThrow('Weather API Down');
   });
 });

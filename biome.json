@@ -14,6 +14,19 @@
     "indentStyle": "space",
     "indentWidth": 2
   },
+  "javascript": {
+    "formatter": {
+      "arrowParentheses": "asNeeded",
+      "bracketSpacing": true,
+      "enabled": true,
+      "jsxQuoteStyle": "single",
+      "lineWidth": 120,
+      "quoteProperties": "asNeeded",
+      "quoteStyle": "single",
+      "semicolons": "always",
+      "trailingCommas": "es5"
+    }
+  },
   "linter": {
     "enabled": true,
     "rules": {

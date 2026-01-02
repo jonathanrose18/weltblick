@@ -1,23 +1,23 @@
-import { Geist, Geist_Mono } from "next/font/google";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ThemeProvider } from "next-themes";
-import { useReportWebVitals } from "next/web-vitals";
-import type { AppProps } from "next/app";
-import type { NextPage } from "next";
-import type { ReactElement, ReactNode } from "react";
+import { Geist, Geist_Mono } from 'next/font/google';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider } from 'next-themes';
+import { useReportWebVitals } from 'next/web-vitals';
+import type { AppProps } from 'next/app';
+import type { NextPage } from 'next';
+import type { ReactElement, ReactNode } from 'react';
 
-import { cn } from "@/shared/lib/utils";
+import { cn } from '@/shared/lib/utils';
 
-import "@/shared/styles/globals.css";
+import '@/shared/styles/globals.css';
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
 });
 
 const queryClient = new QueryClient();
@@ -31,22 +31,20 @@ type AppPropsWithLayout = AppProps & {
 };
 
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
-  useReportWebVitals((vitals) => console.log("Vitals: ", vitals));
+  useReportWebVitals(vitals => console.log('Vitals: ', vitals));
 
-  const getLayout = Component.getLayout ?? ((page) => page);
+  const getLayout = Component.getLayout ?? (page => page);
 
   return (
     <main
       className={cn(
         geistSans.className,
         geistMono.variable,
-        "h-screen overflow-y-auto tracking-tight antialiased dark:from-zinc-900 dark:to-zinc-900 dark:via-black dark:bg-linear-to-bl bg-linear-to-bl from-zinc-200 via-white to-zinc-200",
+        'h-screen overflow-y-auto tracking-tight antialiased dark:from-zinc-900 dark:to-zinc-900 dark:via-black dark:bg-linear-to-bl bg-linear-to-bl from-zinc-200 via-white to-zinc-200'
       )}
     >
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <QueryClientProvider client={queryClient}>
-          {getLayout(<Component {...pageProps} />)}
-        </QueryClientProvider>
+      <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
+        <QueryClientProvider client={queryClient}>{getLayout(<Component {...pageProps} />)}</QueryClientProvider>
       </ThemeProvider>
     </main>
   );
