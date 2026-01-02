@@ -6,11 +6,11 @@ import type { WeatherData } from "@/features/weather/types";
 import { NotFoundError } from "@/shared/lib/errors";
 
 export async function getWeatherForCountry(
-  countryName: string
+  countryName: string,
 ): Promise<WeatherData> {
   const sanitizedCountryName = countryName.trim().toLowerCase();
   const countriesResponse = await countriesClient.get<Country[]>(
-    `/name/${sanitizedCountryName}?fullText=true`
+    `/name/${sanitizedCountryName}?fullText=true`,
   );
 
   const countryData = countriesResponse.data[0];
@@ -18,7 +18,7 @@ export async function getWeatherForCountry(
 
   if (!latlng || latlng.length !== 2) {
     throw new NotFoundError(
-      `No location data found for country: ${sanitizedCountryName}`
+      `No location data found for country: ${sanitizedCountryName}`,
     );
   }
 

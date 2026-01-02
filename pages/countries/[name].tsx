@@ -21,7 +21,7 @@ export const getServerSideProps = (async (context) => {
 
   try {
     const res = await countriesClient.get<Country[]>(
-      `/name/${name}?fullText=true`
+      `/name/${name}?fullText=true`,
     );
     return {
       props: {

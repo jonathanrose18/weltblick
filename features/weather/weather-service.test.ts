@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { getWeatherForCountry } from "./weather-service";
+
+import { NotFoundError } from "@/shared/lib/errors";
 import { countriesClient } from "@/features/countries/countries-client";
+import { getWeatherForCountry } from "@/features/weather/weather-service";
 import { weatherClient } from "@/features/weather/weather-client";
 import type { Country } from "@/features/countries/types";
-import { NotFoundError } from "@/shared/lib/errors";
 
-// Mock the clients
 vi.mock("@/features/countries/countries-client", () => ({
   countriesClient: {
     get: vi.fn(),
@@ -24,14 +24,12 @@ describe("WeatherService", () => {
   });
 
   it("should fetch weather data for a valid country name", async () => {
-    // Mock Country Data
     const mockCountry: Partial<Country> = {
       name: { common: "Germany", official: "Federal Republic of Germany" },
       capitalInfo: { latlng: [51.0, 9.0] },
     };
     (countriesClient.get as any).mockResolvedValue({ data: [mockCountry] });
 
-    // Mock Weather Data
     const mockWeather = {
       current: {
         temperature_2m: 20,
@@ -44,7 +42,7 @@ describe("WeatherService", () => {
     const result = await getWeatherForCountry("Germany");
 
     expect(countriesClient.get).toHaveBeenCalledWith(
-      "/name/germany?fullText=true"
+      "/name/germany?fullText=true",
     );
     expect(weatherClient.get).toHaveBeenCalledWith(
       "/forecast",
@@ -53,7 +51,7 @@ describe("WeatherService", () => {
           latitude: 51.0,
           longitude: 9.0,
         }),
-      })
+      }),
     );
     expect(result).toEqual(mockWeather);
   });
@@ -74,12 +72,11 @@ describe("WeatherService", () => {
     (countriesClient.get as any).mockResolvedValue({ data: [mockCountry] });
 
     await expect(getWeatherForCountry("Nowhere")).rejects.toThrow(
-      NotFoundError
+      NotFoundError,
     );
   });
 
   it("should throw Error if weather fetch fails", async () => {
-    // Mock Country Data
     const mockCountry: Partial<Country> = {
       name: { common: "Germany", official: "Federal Republic of Germany" },
       capitalInfo: { latlng: [51.0, 9.0] },
@@ -89,7 +86,7 @@ describe("WeatherService", () => {
     (weatherClient.get as any).mockRejectedValue(new Error("Weather API Down"));
 
     await expect(getWeatherForCountry("Germany")).rejects.toThrow(
-      "Weather API Down"
+      "Weather API Down",
     );
   });
 });

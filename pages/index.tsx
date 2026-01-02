@@ -8,22 +8,16 @@ import { HoverCard } from "@/shared/components/ui/hover-card";
 import { Layout } from "@/shared/components/layout";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { countriesClient } from "@/features/countries/countries-client";
+import { sortCountriesByName } from "@/features/countries/utils";
+import type { Country } from "@/features/countries/types";
 import type { NextPageWithLayout } from "@/pages/_app";
-
-type Country = {
-  capital?: string[];
-  name: { common: string };
-  flags: { png: string; alt: string };
-};
 
 export const getStaticProps = (async () => {
   const res = await countriesClient.get<Country[]>(
-    "/all?fields=name,flags,capital"
+    "/all?fields=name,flags,capital",
   );
 
-  const countries = res.data.sort((a, b) =>
-    a.name.common.localeCompare(b.name.common)
-  );
+  const countries = sortCountriesByName(res.data);
 
   return {
     props: {
@@ -40,7 +34,7 @@ const Page: NextPageWithLayout<PageProps> = ({ countries, lastUpdated }) => {
   const lastUpdatedDistance = formatDistance(
     new Date(),
     new Date(lastUpdated),
-    { includeSeconds: true }
+    { includeSeconds: true },
   );
   return (
     <div className="grid grid-cols-12 gap-4">
@@ -57,12 +51,16 @@ const Page: NextPageWithLayout<PageProps> = ({ countries, lastUpdated }) => {
               </div>
 
               <span className="text-sm text-balance text-muted-foreground">
-                {c.capital?.join(", ")}
+                {c.capital?.join(", ") ?? "No capital"}
               </span>
             </div>
             <div className="relative h-8 w-8 min-w-8 min-h-8 rounded-full overflow-hidden">
               <Skeleton className="h-8 w-8" />
-              <Image alt={c.flags.alt} fill src={c.flags.png} />
+              <Image
+                alt={c.flags.alt || `Flag of ${c.name.common}`}
+                fill
+                src={c.flags.png}
+              />
             </div>
           </HoverCard>
         </Link>
