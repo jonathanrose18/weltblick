@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { sortCountriesByName } from './utils';
+import { getCurrentTimeInTimezone, sortCountriesByName } from './utils';
 import type { Country } from './types';
 
 describe('sortCountriesByName', () => {
@@ -73,5 +73,31 @@ describe('sortCountriesByName', () => {
     ] as unknown as Country[];
     const sorted = sortCountriesByName(input);
     expect(sorted).toEqual(input);
+  });
+});
+
+describe('getCurrentTimeInTimezone', () => {
+  it('should return correct time for UTC', () => {
+    const now = new Date('2023-01-01T12:00:00Z');
+    expect(getCurrentTimeInTimezone('UTC', now)).toBe('12:00');
+  });
+
+  it('should return correct time for UTC+01:00', () => {
+    const now = new Date('2023-01-01T12:00:00Z');
+    expect(getCurrentTimeInTimezone('UTC+01:00', now)).toBe('13:00');
+  });
+
+  it('should return correct time for UTC-05:00', () => {
+    const now = new Date('2023-01-01T12:00:00Z');
+    expect(getCurrentTimeInTimezone('UTC-05:00', now)).toBe('07:00');
+  });
+
+  it('should return correct time for UTC+05:30', () => {
+    const now = new Date('2023-01-01T12:00:00Z');
+    expect(getCurrentTimeInTimezone('UTC+05:30', now)).toBe('17:30');
+  });
+
+  it('should return empty string for invalid timezone', () => {
+    expect(getCurrentTimeInTimezone('Invalid')).toBe('');
   });
 });

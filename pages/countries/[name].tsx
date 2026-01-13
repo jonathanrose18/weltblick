@@ -11,6 +11,7 @@ import { HoverCard } from '@/shared/components/ui/hover-card';
 import { WeatherCard } from '@/features/weather/components/weather-card';
 import { countriesClient } from '@/features/countries/countries-client';
 import { useWeather } from '@/features/weather/use-weather';
+import { getCurrentTimeInTimezone } from '@/features/countries/utils';
 import type { Country } from '@/features/countries/types';
 import type { NextPageWithLayout } from '@/pages/_app';
 
@@ -28,6 +29,7 @@ export const getServerSideProps = (async context => {
       },
     };
   } catch (error) {
+    console.error('Error in getServerSideProps', error);
     return { notFound: true };
   }
 }) satisfies GetServerSideProps<{
@@ -99,7 +101,7 @@ const Page: NextPageWithLayout<PageProps> = ({ country }) => {
             </div>
             {country.timezones.map(timezone => (
               <Badge key={timezone} variant='outline'>
-                {timezone}
+                {timezone} ({getCurrentTimeInTimezone(timezone)})
               </Badge>
             ))}
           </HoverCard>

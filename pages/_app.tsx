@@ -40,7 +40,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       className={cn(
         geistSans.className,
         geistMono.variable,
-        'h-screen overflow-y-auto tracking-tight antialiased dark:from-zinc-900 dark:to-zinc-900 dark:via-black dark:bg-linear-to-bl bg-linear-to-bl from-zinc-200 via-white to-zinc-200'
+        'h-screen overflow-y-auto tracking-tight antialiased dark:via-zinc-900 dark:from-black dark:to-black dark:bg-linear-to-b bg-linear-to-b from-white via-zinc-200 to-white'
       )}
     >
       <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
